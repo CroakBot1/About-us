@@ -264,3 +264,250 @@ function animateFleet(){
 }
 animateFleet();
 </script>
+<!-- START: Top-left Clickable FAQ (Responsive Button Box - Fixed) -->
+<style>
+  .faq-link {
+    position: fixed;
+    top: 60px;
+    left: 32px; /* left side */
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: #0ea5e9;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    z-index: 10000; /* taas og priority */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    transition: background 0.25s, transform 0.2s;
+  }
+  .faq-link:hover {
+    background: #0284c7;
+    transform: scale(1.05);
+  }
+
+  .faq-panel {
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    position: fixed;
+    top: 80px;
+    left: 28px; /* moved to left */
+    background: #0f172a;
+    border-radius: 12px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    padding: 14px;
+    z-index: 10000; /* same as button */
+    transform-origin: top left;
+    transition: transform .2s ease, opacity .2s ease;
+    opacity: 0;
+    transform: translateY(-6px) scale(.96);
+    pointer-events: none;
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  .faq-panel.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .faq-header {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .faq-header h2 {
+    margin:0;
+    font-size:16px;
+    color:#00ffe0;
+  }
+  .faq-close {
+    background:transparent;
+    border:none;
+    font-size:20px;
+    cursor:pointer;
+    color:#e6eef8;
+  }
+
+  /* --- FAQ inner styling --- */
+  .faq-container {
+    font-family: Arial, sans-serif;
+    color: #e6eef8;
+  }
+  .faq-item {
+    background: #1e293b;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  }
+  .faq-question {
+    padding: 15px;
+    cursor: pointer;
+    background: #0ea5e9;
+    font-weight: bold;
+    color: #fff;
+    transition: background 0.3s;
+  }
+  .faq-question:hover { background: #0284c7; }
+  .faq-answer {
+    padding: 15px;
+    display: none;
+    background: #1e293b;
+    color: #cbd5e1;
+  }
+  .faq-answer a {
+    color: #00ffe0;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  /* --------- Responsive --------- */
+  @media (max-width: 768px) {
+    .faq-link {
+      top: 20px;
+      left: 20px;
+      font-size: 14px;
+      padding: 8px 14px;
+    }
+    .faq-panel {
+      top: 60px;
+      left: 10px;
+      width: calc(100vw - 20px);
+      max-height: 75vh;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .faq-link {
+      top: 15px;
+      left: 15px;
+      font-size: 13px;
+      padding: 7px 12px;
+    }
+    .faq-panel {
+      top: 55px;
+      left: 5px;
+      width: calc(100vw - 10px);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .faq-header h2 {
+      font-size: 14px;
+    }
+    .faq-question {
+      font-size: 14px;
+      padding: 12px;
+    }
+    .faq-answer {
+      font-size: 13px;
+      padding: 12px;
+    }
+  }
+</style>
+
+<div id="faqLink" class="faq-link">❓ FAQ</div>
+
+<div id="faqPanel" class="faq-panel">
+  <div class="faq-header">
+    <h2>Quantum Trading Bot FAQ</h2>
+    <button class="faq-close" id="faqClose">✕</button>
+  </div>
+
+  <div class="faq-container">
+    <div class="faq-item">
+      <div class="faq-question">❓ What is Quantum Trading Bot?</div>
+      <div class="faq-answer">
+        Quantum Trading Bot is an advanced AI-powered crypto trading bot that uses quantum-inspired algorithms...
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ How does it work?</div>
+      <div class="faq-answer">
+        📊 Multi-timeframe analysis<br>🧠 AI strategy core (61k+ scenarios)<br>🔄 Self-correcting logic<br>⚡ Fast execution
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Do I need trading experience?</div>
+      <div class="faq-answer">
+        Not at all! The bot is plug-and-play, so even beginners can use it.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Which exchanges are supported?</div>
+      <div class="faq-answer">
+        Binance, Bybit, Coinbase Pro, KuCoin, and more coming soon.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ How do I get started?</div>
+      <div class="faq-answer">
+        To get started, you need to <strong>Buy the Access Code</strong>.<br>
+        This code will unlock your account and give you full bot access.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Are my funds safe?</div>
+      <div class="faq-answer">
+        ✅ Yes. The bot has no withdrawal access – your funds remain in your exchange wallet.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ How is it different?</div>
+      <div class="faq-answer">
+        ⚡ Quantum parallel analysis<br>🧩 61k scenario brain<br>🧠 Self-correcting AI<br>🎯 Dynamic TP/SL calculator
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Subscription fees?</div>
+      <div class="faq-answer">
+        Starter / Pro / Elite Quantum plans – details on Telegram.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ Is there a demo?</div>
+      <div class="faq-answer">
+        Yes – Paper Trading Mode lets you test performance risk-free.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">❓ How can I get support?</div>
+      <div class="faq-answer">
+        📢 <a href="https://t.me/QuantumTradingBot1" target="_blank">Join us on Telegram</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const faqLink = document.getElementById("faqLink");
+  const faqPanel = document.getElementById("faqPanel");
+  const faqClose = document.getElementById("faqClose");
+
+  faqLink.addEventListener("click", () => {
+    faqPanel.classList.toggle("open");
+  });
+
+  faqClose.addEventListener("click", () => {
+    faqPanel.classList.remove("open");
+  });
+
+  document.querySelectorAll(".faq-question").forEach(q => {
+    q.addEventListener("click", () => {
+      const ans = q.nextElementSibling;
+      ans.style.display = ans.style.display === "block" ? "none" : "block";
+    });
+  });
+</script>
+<!-- END: Top-left Clickable FAQ (Responsive Button Box - Fixed) -->
