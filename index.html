@@ -511,3 +511,124 @@ animateFleet();
   });
 </script>
 <!-- END: Top-left Clickable FAQ (Responsive Button Box - Fixed) -->
+<!-- Add-on Script for Quantum Trading Bot Developers (16 Devs) -->
+<div id="quantumDevAddon" style="
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  text-align:center;
+">
+  <button id="showDevBtn" style="
+    background: linear-gradient(90deg,#0ea5e9,#0284c7);
+    border:none; color:#fff; padding:12px 20px; border-radius:10px;
+    font-weight:600; cursor:pointer; font-size:16px; box-shadow:0 4px 12px rgba(14,165,233,0.3);
+  ">Show Developers</button>
+</div>
+
+<div id="strategyGrid" class="grid" style="display:none; max-width:1300px; margin:auto; gap:24px; grid-template-columns: repeat(auto-fit,minmax(320px,1fr));"></div>
+
+<script>
+(function(){
+  const strategies = [
+    // Original 11 developers
+    {id:1, name:"Quantum Scalper Pro", dev:{name:"Alex Tan", role:"Lead Strategist", img:"https://i.pravatar.cc/200?img=1"}, tags:["Scalping","High Frequency"], winrate:0.83, tradesPerMonth:320, rating:4.9, profit:75000, subs:420, price:199, featured:true},
+    {id:2, name:"Neural Swing AI", dev:{name:"Maria Lopez", role:"AI Developer", img:"https://i.pravatar.cc/200?img=2"}, tags:["Swing","AI Powered"], winrate:0.78, tradesPerMonth:120, rating:4.7, profit:54000, subs:310, price:149},
+    {id:3, name:"ETH Quantum Rider", dev:{name:"James Wu", role:"ETH Specialist", img:"https://i.pravatar.cc/200?img=3"}, tags:["Ethereum","Mid-term"], winrate:0.81, tradesPerMonth:90, rating:4.8, profit:62000, subs:280, price:129},
+    {id:4, name:"BTC Lightning Bot", dev:{name:"Sarah Kim", role:"BTC Analyst", img:"https://i.pravatar.cc/200?img=4"}, tags:["Bitcoin","Day Trade"], winrate:0.76, tradesPerMonth:200, rating:4.6, profit:47000, subs:360, price:139},
+    {id:5, name:"Altcoin Quantum Hunter", dev:{name:"Daniel Cruz", role:"Altcoin Expert", img:"https://i.pravatar.cc/200?img=5"}, tags:["Altcoins","Degen"], winrate:0.71, tradesPerMonth:150, rating:4.5, profit:39000, subs:190, price:119},
+    {id:6, name:"DeFi Quantum Yield", dev:{name:"Olivia Park", role:"DeFi Researcher", img:"https://i.pravatar.cc/200?img=6"}, tags:["DeFi","Yield"], winrate:0.74, tradesPerMonth:70, rating:4.4, profit:41000, subs:150, price:109},
+    {id:7, name:"AI Momentum Master", dev:{name:"Victor Singh", role:"Momentum Trader", img:"https://i.pravatar.cc/200?img=7"}, tags:["Momentum","AI"], winrate:0.79, tradesPerMonth:180, rating:4.7, profit:56000, subs:270, price:159},
+    {id:8, name:"Quantum BreakoutX", dev:{name:"Hannah Lee", role:"Breakout Strategist", img:"https://i.pravatar.cc/200?img=8"}, tags:["Breakouts","Scalping"], winrate:0.75, tradesPerMonth:220, rating:4.5, profit:43000, subs:230, price:139},
+    {id:9, name:"Crypto Options AI", dev:{name:"Robert Miles", role:"Options Specialist", img:"https://i.pravatar.cc/200?img=9"}, tags:["Options","Derivatives"], winrate:0.69, tradesPerMonth:55, rating:4.3, profit:37000, subs:140, price:179},
+    {id:10, name:"Quantum Long-Term Alpha", dev:{name:"Elena Petrova", role:"Macro Analyst", img:"https://i.pravatar.cc/200?img=10"}, tags:["Long-term","Macro"], winrate:0.82, tradesPerMonth:20, rating:4.8, profit:72000, subs:390, price:189},
+    {id:11, name:"Litecoin Quantum Scout", dev:{name:"Mark Li", role:"LTC Specialist", img:"https://i.pravatar.cc/200?img=11"}, tags:["Litecoin","Mid-term"], winrate:0.77, tradesPerMonth:100, rating:4.6, profit:45000, subs:210, price:139},
+
+    // 5 New Developers
+    {id:12, name:"Satoshi AI Bot", dev:{name:"Liam Nakamura", role:"Blockchain Developer", img:"https://i.pravatar.cc/200?img=12"}, tags:["Bitcoin","AI"], winrate:0.80, tradesPerMonth:190, rating:4.7, profit:58000, subs:250, price:159},
+    {id:13, name:"Altcoin SurgeX", dev:{name:"Sophia Chen", role:"Altcoin Analyst", img:"https://i.pravatar.cc/200?img=13"}, tags:["Altcoins","Swing"], winrate:0.73, tradesPerMonth:140, rating:4.5, profit:42000, subs:180, price:129},
+    {id:14, name:"ETH Signal Pro", dev:{name:"Noah Kapoor", role:"ETH Specialist", img:"https://i.pravatar.cc/200?img=14"}, tags:["Ethereum","Signals"], winrate:0.78, tradesPerMonth:110, rating:4.6, profit:50000, subs:220, price:149},
+    {id:15, name:"DeFi Flash Bot", dev:{name:"Isabella Rossi", role:"DeFi Strategist", img:"https://i.pravatar.cc/200?img=15"}, tags:["DeFi","High Frequency"], winrate:0.75, tradesPerMonth:160, rating:4.5, profit:44000, subs:200, price:139},
+    {id:16, name:"Crypto Arbitrage AI", dev:{name:"Ethan Brown", role:"Arbitrage Specialist", img:"https://i.pravatar.cc/200?img=16"}, tags:["Arbitrage","AI"], winrate:0.79, tradesPerMonth:130, rating:4.7, profit:47000, subs:210, price:159}
+  ];
+
+  const grid=document.getElementById('strategyGrid');
+
+  function renderGrid(list){
+    grid.innerHTML='';
+    list.forEach(s=>{
+      const card=document.createElement('div'); 
+      card.className='card';
+      card.style.cssText = `
+        background: rgba(30,41,59,0.95);
+        border-radius: 16px;
+        padding: 22px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        border: 1px solid rgba(255,255,255,0.05);
+      `;
+      card.innerHTML=`
+        <div class="card-top" style="display:flex; align-items:center; margin-bottom:16px;">
+          <div style="position:relative">
+            <img class="avatar" src="${s.dev.img}" alt="${s.dev.name}" style="width:60px;height:60px;border-radius:50%;margin-right:14px;border:3px solid #00ffe0;box-shadow:0 0 12px rgba(0,255,224,0.4);transition:transform 0.2s ease;">
+            <div class="shimmer" style="position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,rgba(0,255,224,0.2) 0%,rgba(255,255,255,0.6) 50%,rgba(0,255,224,0.2) 100%);z-index:2;pointer-events:none;animation:shimmerMove 3s linear infinite;"></div>
+          </div>
+          <div class="card-title">
+            <h3 style="margin:0;font-size:20px;color:#fff;">${s.name}</h3>
+            <small style="color:#94a3b8;font-size:13px;">${s.dev.name} • ${s.dev.role}</small>
+          </div>
+        </div>
+        <div class="badges" style="display:flex; flex-wrap:wrap; gap:8px; margin:10px 0;">
+          ${s.tags.map(t=>`<div style="background:linear-gradient(90deg,#0ea5e9,#06b6d4);color:#fff;font-size:12px;padding:5px 10px;border-radius:8px;font-weight:500;box-shadow:0 2px 6px rgba(0,0,0,0.3);">${t}</div>`).join('')}
+        </div>
+        <div class="metrics" style="margin-top:10px;font-size:14px;">
+          <div style="margin:4px 0;">Win rate: <strong style="color:#00ffe0;">${Math.round(s.winrate*100)}%</strong></div>
+          <div style="margin:4px 0;">Trades/mo: <strong style="color:#00ffe0;">${s.tradesPerMonth}</strong></div>
+          <div style="margin:4px 0;color:#ffd700;font-weight:600;">★ ${s.rating.toFixed(1)}</div>
+          <div style="margin:4px 0;">Profit: <strong style="color:#00ffe0;">$${s.profit.toLocaleString()}+</strong></div>
+          <div style="margin:4px 0;">👥 ${s.subs} Subscribers</div>
+        </div>
+        <div class="card-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;">
+          <div><div style="font-size:22px;font-weight:bold;color:#00ffe0;">$${s.price}</div><div style="font-size:12px;color:#94a3b8;">/mo</div></div>
+          <div><a href="https://quantum-payment.vercel.app/" target="_blank" style="background:linear-gradient(90deg,#0ea5e9,#0284c7);border:none;color:#fff;padding:9px 16px;border-radius:10px;font-weight:600;text-decoration:none;font-size:14px;box-shadow:0 4px 12px rgba(14,165,233,0.3);">Subscribe</a></div>
+        </div>
+      `;
+      if(s.featured){
+        card.style.border='2px solid gold';
+        card.style.boxShadow='0 0 25px rgba(255,215,0,0.5)';
+      }
+      grid.appendChild(card);
+
+      // Avatar tilt + pulse + shimmer
+      const avatar = card.querySelector('.avatar');
+      const shimmer = card.querySelector('.shimmer');
+      avatar.addEventListener('mousemove', e=>{
+        const rect = avatar.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width/2;
+        const y = e.clientY - rect.top - rect.height/2;
+        avatar.style.transform = `rotateY(${x/10}deg) rotateX(${-y/10}deg)`;
+      });
+      avatar.addEventListener('mouseleave', ()=> avatar.style.transform='');
+      const pulseInterval = ()=>{
+        const delay=Math.random()*3000+2000;
+        setTimeout(()=>{
+          avatar.style.animation='pulse 1s ease-in-out';
+          setTimeout(()=>{avatar.style.animation=''; pulseInterval();},1000);
+        },delay);
+      };
+      pulseInterval();
+      shimmer.style.animationDuration = `${Math.random()*2+1}s`;
+    });
+  }
+
+  document.getElementById('showDevBtn').addEventListener('click', ()=>{
+    grid.style.display='grid';
+    renderGrid(strategies);
+    document.getElementById('showDevBtn').style.display='none';
+  });
+})();
+</script>
+
+<style>
+@keyframes shimmerMove{0%{transform:translate(-50%,-50%) rotate(45deg);}50%{transform:translate(0,0) rotate(45deg);}100%{transform:translate(-50%,-50%) rotate(45deg);}}
+@keyframes pulse{0%,100%{filter:brightness(1);transform:scale(1);}50%{filter:brightness(1.2);transform:scale(1.05);}}
+</style>
