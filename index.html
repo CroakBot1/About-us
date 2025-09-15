@@ -632,5 +632,210 @@ animateFleet();
 @keyframes pulse{0%,100%{filter:brightness(1);transform:scale(1);}50%{filter:brightness(1.2);transform:scale(1.05);}}
 </style>
 
+<style>
+html, body { margin:0; padding:0; width:100%; height:100%; overflow-x:hidden; }
+.addon-panel {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 90%;
+  cursor: grab;
+  touch-action: none;
+  transition: all 0.3s ease;
+}
+.addon-panel.dragging { cursor: grabbing; transition: none; }
+.addon-panel button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  color: #fff;
+  background: linear-gradient(90deg,#0ea5e9,#0284c7);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+</style>
 
+<div class="addon-panel" id="quantumDevAddon">
+  <button>Show Developers</button>
+  <button>Button 2</button>
+  <button>Button 3</button>
+</div>
+
+<script>
+function initAddonPanel(addon){
+  let isDragging=false, offsetX=0, offsetY=0, lastX=0, lastY=0, velX=0, velY=0;
+
+  const saved = JSON.parse(localStorage.getItem(addon.id)||'{}');
+  if(saved.left!==undefined && saved.top!==undefined){
+    addon.style.left = saved.left+'px';
+    addon.style.top = saved.top+'px';
+    addon.style.bottom='auto'; addon.style.right='auto';
+  }
+
+  function adjust(){
+    const w = window.innerWidth, h = window.innerHeight;
+    const scale = Math.min(w/1920,h/1080,1);
+    addon.style.transform=`scale(${scale})`;
+
+    if(!addon.dataset.dragged){
+      if(w<=768) stackPanelsOnMobile();
+      else autoStackPanelsDesktop();
+    }
+
+    const rect = addon.getBoundingClientRect();
+    addon.style.flexDirection=(rect.height>h*0.9)?'column-reverse':'column';
+  }
+
+  function bringToFront(){
+    let maxZ=0;
+    document.querySelectorAll('.addon-panel').forEach(a=>{
+      const z=parseInt(window.getComputedStyle(a).zIndex)||0;
+      if(z>maxZ) maxZ=z;
+    });
+    addon.style.zIndex=maxZ+1;
+  }
+
+  function startDrag(x,y){
+    bringToFront();
+    isDragging=true;
+    offsetX = x-addon.getBoundingClientRect().left;
+    offsetY = y-addon.getBoundingClientRect().top;
+    lastX=x; lastY=y;
+    addon.classList.add('dragging'); addon.dataset.dragged=true;
+  }
+
+  function drag(x,y){
+    if(!isDragging) return;
+    let newX=x-offsetX, newY=y-offsetY;
+    newX=Math.max(0, Math.min(window.innerWidth-addon.offsetWidth, newX));
+    newY=Math.max(0, Math.min(window.innerHeight-addon.offsetHeight, newY));
+    addon.style.left=newX+'px';
+    addon.style.top=newY+'px';
+    addon.style.bottom='auto'; addon.style.right='auto';
+    velX=x-lastX; velY=y-lastY; lastX=x; lastY=y;
+  }
+
+  function stop(){
+    if(!isDragging) return;
+    addon.classList.remove('dragging'); isDragging=false;
+
+    let posX=parseFloat(addon.style.left)+velX*2, posY=parseFloat(addon.style.top)+velY*2;
+    const w=window.innerWidth, h=window.innerHeight;
+    posX=Math.max(0, Math.min(w-addon.offsetWidth,posX));
+    posY=Math.max(0, Math.min(h-addon.offsetHeight,posY));
+
+    let friction=0.92,bounce=0.2;
+    const animate=()=>{
+      posX+=velX; posY+=velY;
+      if(posX<0){posX=0;velX=-velX*bounce;}
+      if(posX>w-addon.offsetWidth){posX=w-addon.offsetWidth;velX=-velX*bounce;}
+      if(posY<0){posY=0;velY=-velY*bounce;}
+      if(posY>h-addon.offsetHeight){posY=h-addon.offsetHeight;velY=-velY*bounce;}
+      addon.style.left=posX+'px'; addon.style.top=posY+'px';
+      velX*=friction; velY*=friction;
+      if(Math.abs(velX)>0.5||Math.abs(velY)>0.5) requestAnimationFrame(animate);
+      else snapCornerAndMagnet();
+    };
+    requestAnimationFrame(animate);
+  }
+
+  function snapCornerAndMagnet(){
+    const rect=addon.getBoundingClientRect();
+    const w=window.innerWidth,h=window.innerHeight;
+    const corners=[{left:10,top:10},{left:w-rect.width-10,top:10},{left:10,top:h-rect.height-10},{left:w-rect.width-10,top:h-rect.height-10}];
+    let closest=corners[0],minDist=Infinity;
+    corners.forEach(c=>{ const dx=rect.left-c.left, dy=rect.top-c.top, dist=Math.sqrt(dx*dx+dy*dy); if(dist<minDist){minDist=dist;closest=c;} });
+
+    document.querySelectorAll('.addon-panel').forEach(other=>{
+      if(other===addon) return;
+      const oRect=other.getBoundingClientRect();
+      const threshold=40;
+      if(Math.abs(rect.left-oRect.left)<threshold) closest.left=oRect.left;
+      if(Math.abs(rect.top-oRect.top)<threshold) closest.top=oRect.top;
+    });
+
+    let stackOffset=0;
+    document.querySelectorAll('.addon-panel').forEach(other=>{
+      if(other===addon) return;
+      const oRect=other.getBoundingClientRect();
+      if(Math.abs(closest.left-oRect.left)<40 && Math.abs(closest.top-oRect.top)<40){
+        stackOffset+=oRect.height+8;
+      }
+    });
+    closest.top += stackOffset;
+
+    addon.style.transition='all 0.4s cubic-bezier(0.22,1,0.36,1)';
+    addon.style.left=closest.left+'px';
+    addon.style.top=closest.top+'px';
+    localStorage.setItem(addon.id,JSON.stringify({left:closest.left,top:closest.top}));
+    velX=0; velY=0;
+  }
+
+  // Mouse
+  addon.addEventListener('mousedown', e=>startDrag(e.clientX,e.clientY));
+  document.addEventListener('mousemove', e=>drag(e.clientX,e.clientY));
+  document.addEventListener('mouseup', stop);
+
+  // Touch
+  addon.addEventListener('touchstart', e=>startDrag(e.touches[0].clientX,e.touches[0].clientY));
+  document.addEventListener('touchmove', e=>drag(e.touches[0].clientX,e.touches[0].clientY), {passive:false});
+  document.addEventListener('touchend', stop);
+
+  window.addEventListener('resize', adjust);
+  window.addEventListener('load', adjust);
+}
+
+// Stack panels dynamically on mobile
+function stackPanelsOnMobile(){
+  let offset=0;
+  document.querySelectorAll('.addon-panel').forEach(a=>{
+    if(window.innerWidth<=768){
+      const rect=a.getBoundingClientRect();
+      a.style.left='auto';
+      a.style.right='10px';
+      a.style.bottom='20px';
+      a.style.top='auto';
+      a.style.transformOrigin='bottom right';
+      a.style.transition='all 0.3s ease';
+      a.style.top=`${window.innerHeight - rect.height - 20 - offset}px`;
+      offset += rect.height + 8;
+    }
+  });
+}
+
+// Auto-stack panels on desktop
+function autoStackPanelsDesktop(){
+  const padding = 10;
+  let currentTop = padding;
+  document.querySelectorAll('.addon-panel').forEach(a=>{
+    const rect = a.getBoundingClientRect();
+    a.style.left = window.innerWidth - rect.width - padding + 'px';
+    a.style.top = currentTop + 'px';
+    a.style.bottom = 'auto';
+    a.style.right = 'auto';
+    currentTop += rect.height + 8; // spacing between panels
+    localStorage.setItem(a.id, JSON.stringify({left:parseFloat(a.style.left),top:parseFloat(a.style.top)}));
+  });
+}
+
+// Initialize existing panels
+document.querySelectorAll('.addon-panel').forEach(initAddonPanel);
+
+// Observe dynamically added panels
+const observer=new MutationObserver(mutations=>{
+  mutations.forEach(m=>{
+    m.addedNodes.forEach(node=>{
+      if(node.classList && node.classList.contains('addon-panel')){
+        initAddonPanel(node);
+        autoStackPanelsDesktop();
+      }
+    });
+  });
+});
+observer.observe(document.body,{childList:true, subtree:true});
+</script>
 
