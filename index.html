@@ -839,18 +839,19 @@ const observer=new MutationObserver(mutations=>{
 observer.observe(document.body,{childList:true, subtree:true});
 </script>
 
-<!-- Fixed White Paper Button (slightly lower from top-right) -->
-<a class="whitepaper-btn" href="https://white-paper-alpha.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Open White Paper">White Paper</a>
+<!-- White Paper Button (Top Center) -->
+<a class="whitepaper-btn-center" href="https://white-paper-alpha.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Open White Paper">White Paper</a>
 
 <style>
-  .whitepaper-btn{
+  .whitepaper-btn-center {
     position: fixed;
-    top: 50px; /* 👈 mas ubos na siya kaysa 18px */
-    right: 18px;
+    top: 20px; /* distance from very top */
+    left: 50%; /* push to the horizontal middle */
+    transform: translateX(-50%); /* exact center */
     z-index: 9999;
 
     display: inline-block;
-    padding: 10px 16px;
+    padding: 10px 18px;
     font-weight: 700;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     font-size: 14px;
@@ -865,16 +866,16 @@ observer.observe(document.body,{childList:true, subtree:true});
       0 6px 18px rgba(11,11,11,0.08),
       inset 0 1px 0 rgba(255,255,255,0.7);
 
-    transform: translateZ(0);
     transition: transform 150ms ease, box-shadow 150ms ease;
     text-decoration: none;
     user-select: none;
   }
 
-  .whitepaper-btn:hover{
-    transform: translateY(-4px);
+  .whitepaper-btn-center:hover {
+    transform: translateX(-50%) translateY(-4px);
     box-shadow:
       0 14px 30px rgba(11,11,11,0.12),
       inset 0 1px 0 rgba(255,255,255,0.75);
   }
 </style>
+
